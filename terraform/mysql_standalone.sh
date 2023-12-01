@@ -1,32 +1,33 @@
 #!/bin/bash
 
-exec > /home/ubuntu/startup.log 2>&1
+exec > /home/ubuntu/logs.log 2>&1 # tail -f logs.log
 
-# install docker
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg
-
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-# Add the repository to Apt sources:
-echo \
-  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-
-# Install lastest version
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# install mysql
+sudo apt-get update -y
+#installing dependencies 
+sudo apt-get install -y unzip
+#installing mysql
 sudo apt-get install -y mysql-server
+# instal sysbench for benchmarking
+apt-get install sysbench
 
+cd ~ # ~ = home/ubuntu
 #security for mysql.
-# sudo mysql_secure_installation pas necessaire i think.
+# https://stackoverflow.com/questions/20760908/what-is-purpose-of-using-mysql-secure-installation
+# As we will only leave the instances running for a couple of minutues to benchmark, i feel like it is not necessary.
+#sudo mysql_secure_installation 
 
-sudo apt-get install -y mysqltuner
+# lets get the sakilaDB installation files: 
+# From this website we take : https://dev.mysql.com/doc/index-other.html 
+# We want the sakila database available at this link. 
+wget https://downloads.mysql.com/docs/sakila-db.zip
+unzip sakila-db.zip -d /db
 
-sudo mysql
+# mysql -e "SOURCE /db/sakila-db/sakila-schema.sql;"
+# mysql -e "SOURCE /db/sakila-db/sakila-data.sql;"
+
+mysql < /db/sakila-db/sakila-schema.sql
+mysql < /db/sakila-db/sakila-data.sql
+
+# Did it get created?
+mysql sakila -e "SHOW FULL TABLES;"
+mysql sakila -e "SELECT COUNT(*) FROM film;"
