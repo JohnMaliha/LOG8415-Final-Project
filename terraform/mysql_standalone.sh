@@ -11,6 +11,7 @@ sudo apt-get install -y mysql-server
 apt-get install sysbench
 
 cd ~ # ~ = home/ubuntu
+
 #security for mysql.
 # https://stackoverflow.com/questions/20760908/what-is-purpose-of-using-mysql-secure-installation
 # As we will only leave the instances running for a couple of minutues to benchmark, i feel like it is not necessary.
@@ -28,6 +29,6 @@ unzip sakila-db.zip -d /db
 mysql < /db/sakila-db/sakila-schema.sql
 mysql < /db/sakila-db/sakila-data.sql
 
-# Did it get created?
+# creates
 mysql sakila -e "SHOW FULL TABLES;"
 mysql sakila -e "SELECT COUNT(*) FROM film;"
