@@ -61,7 +61,7 @@ resource "aws_instance" "t2_mysql_manager" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"  
   user_data = file("mysql_cluster_manager.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.42.0" # manually give ips addresses to each instances.
+  private_ip = "172.31.20.0" # manually give ips addresses to each instances.
     tags = {
     Name = "t2_mysql_cluster_manager"
   } 
@@ -74,7 +74,7 @@ resource "aws_instance" "t2_mysql_worker1" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.42.1"
+  private_ip = "172.31.20.1"
     tags = {
     Name = "t2_mysql_cluster_worker1"
   } 
@@ -85,7 +85,7 @@ resource "aws_instance" "t2_mysql_worker2" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.42.2"
+  private_ip = "172.31.20.2"
     tags = {
     Name = "t2_mysql_cluster_worker2"
   } 
@@ -97,7 +97,7 @@ resource "aws_instance" "t2_mysql_worker3" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.42.3"
+  private_ip = "172.31.20.3"
     tags = {
     Name = "t2_mysql_cluster_worker3"
   } 

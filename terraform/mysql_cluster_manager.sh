@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-42-0.ec2.internal
+hostname=ip-172-31-20-0.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-42-1.ec2.internal
+hostname=ip-172-31-20-1.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-42-2.ec2.internal
+hostname=ip-172-31-20-2.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-42-3.ec2.internal
+hostname=ip-172-31-20-3.ec2.internal
 nodeid=4
 
 [mysqld]
@@ -74,6 +74,7 @@ sudo chown -R mysql:mysql /opt/mysqlcluster/home/mysqlc
 
 # Start management node
 sudo /opt/mysqlcluster/home/mysqlc/bin/ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
+#ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
 
 # check status of management data nodes
 ndb_mgm -e show
