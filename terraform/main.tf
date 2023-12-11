@@ -69,7 +69,7 @@ resource "aws_instance" "t2_mysql_manager" {
 
 # create 3 t2 micro mysql_clusters workers instances
 resource "aws_instance" "t2_mysql_worker1" {
-  count         = 0
+  count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
@@ -80,7 +80,7 @@ resource "aws_instance" "t2_mysql_worker1" {
   } 
 }
 resource "aws_instance" "t2_mysql_worker2" {
-  count         = 0
+  count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
@@ -92,7 +92,7 @@ resource "aws_instance" "t2_mysql_worker2" {
 }
 
 resource "aws_instance" "t2_mysql_worker3" {
-  count         = 0
+  count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
