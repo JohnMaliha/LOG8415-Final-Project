@@ -4,7 +4,7 @@ exec > /home/ubuntu/logs.log 2>&1 # tail -f logs.log
 # this is the commun code section
 # Update and install dependencies
 sudo apt update -y
-sudo apt-get install -y sysbench unzip
+sudo apt-get install -y sysbench unzip expect
 
 # Download and install MySQL Cluster
 mkdir -p /opt/mysqlcluster/home
@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-20-0.ec2.internal
+hostname=ip-172-31-43-0.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-20-1.ec2.internal
+hostname=ip-172-31-43-1.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-20-2.ec2.internal
+hostname=ip-172-31-43-2.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-20-3.ec2.internal
+hostname=ip-172-31-43-3.ec2.internal
 nodeid=4
 
 [mysqld]
@@ -82,4 +82,50 @@ ndb_mgm -e show
 # start the sql node
 mysqld --defaults-file=/opt/mysqlcluster/deploy/conf/my.cnf --user=root &
 
+# Increase sleep time to ensure MySQL is ready
+sleep 10
+
 ndb_mgm -e show
+
+# Automate mysql_secure_installation
+cat > ~/install_secure_mysql.sh >/dev/null << EOF
+#!/usr/bin/expect
+set timeout 20
+
+spawn $(which mysql_secure_installation)
+expect "Enter current password for root (enter for none):"
+send "root\r"
+expect "Set root password? \\[Y/n\\]"
+send "n\r"
+expect "Remove anonymous users? \\[Y/n\\]"
+send "y\r"
+expect "Disallow root login remotely? \\[Y/n\\]"
+send "y\r"
+expect "Remove test database and access to it? \\[Y/n\\]"
+send "y\r"
+expect "Reload privilege tables now? \\[Y/n\\]"
+send "y\r"
+expect eof
+EOF
+
+# Change the owner to root and make the script executable
+sudo chown root:root ~/install_secure_mysql.sh
+sudo chmod 4755 ~/install_secure_mysql.sh
+
+# Execute the script
+sudo ~/install_secure_mysql.sh
+
+#remove the script after execution
+#rm -f -v ~/install_secure_mysql.sh
+
+# install sakila db
+cd ~
+wget https://downloads.mysql.com/docs/sakila-db.zip
+unzip sakila-db.zip -d /db
+
+mysql < /db/sakila-db/sakila-schema.sql
+mysql < /db/sakila-db/sakila-data.sql
+
+# creates
+mysql sakila -e "SHOW FULL TABLES;"
+mysql sakila -e "SELECT COUNT(*) FROM film;"

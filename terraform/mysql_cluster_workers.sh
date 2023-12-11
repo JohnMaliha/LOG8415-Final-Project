@@ -21,30 +21,7 @@ sudo apt-get update && sudo apt-get -y install libncurses5
 
 mkdir -p /opt/mysqlcluster/deploy/ndb_data
 # start up Data Node with the address of the manager
-ndbd -c ip-172-31-20-0.ec2.internal:1186 # 1186 default port 
-
-# MAX_ATTEMPTS=30
-# ATTEMPT=0
-# SUCCESS=false
-
-# # Loop to check status
-# while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-#     # Check status
-#     if ndb_mgm -e show | grep -q "connected"; then
-#         SUCCESS=true
-#         break
-#     fi
-
-#     ATTEMPT=$((ATTEMPT+1))
-#     sleep 10
-# done
-
-# if [ "$SUCCESS" = true ]; then
-#     echo "All nodes are successfully connected."
-# else
-#     echo "Failed to connect all nodes within the expected time."
-#     exit 1
-# fi
+ndbd -c ip-172-31-43-0.ec2.internal:1186 # 1186 default port 
 
 # check status of management data nodes
 ndb_mgm -e show
