@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-43-0.ec2.internal
+hostname=ip-172-31-27-0.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-43-1.ec2.internal
+hostname=ip-172-31-27-1.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-43-2.ec2.internal
+hostname=ip-172-31-27-2.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-43-3.ec2.internal
+hostname=ip-172-31-27-3.ec2.internal
 nodeid=4
 
 [mysqld]
@@ -74,7 +74,7 @@ sudo chown -R mysql:mysql /opt/mysqlcluster/home/mysqlc
 
 # Start management node
 sudo /opt/mysqlcluster/home/mysqlc/bin/ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
-#ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
+# ndb_mgmd -f /opt/mysqlcluster/deploy/conf/config.ini --initial --configdir=/opt/mysqlcluster/deploy/conf/
 
 # check status of management data nodes
 ndb_mgm -e show
@@ -118,14 +118,23 @@ sudo ~/install_secure_mysql.sh
 #remove the script after execution
 #rm -f -v ~/install_secure_mysql.sh
 
+# Increase sleep time to ensure MySQL is ready
+while ! mysqladmin ping --silent; do
+    sleep 1
+done
+
+ndb_mgm -e show
+
 # install sakila db
 cd ~
 wget https://downloads.mysql.com/docs/sakila-db.zip
 unzip sakila-db.zip -d /db
 
-mysql < /db/sakila-db/sakila-schema.sql
-mysql < /db/sakila-db/sakila-data.sql
+mysql -u root -e  "SOURCE /db/sakila-db/sakila-schema.sql"
+mysql -u root -e  "SOURCE /db/sakila-db/sakila-data.sql"
 
-# creates
-mysql sakila -e "SHOW FULL TABLES;"
-mysql sakila -e "SELECT COUNT(*) FROM film;"
+# lets make sur it installs correctly!
+mysql -u root -e "USE sakila; SHOW FULL TABLES;"
+mysql -u root -e "USE sakila; SELECT COUNT(*) FROM film;"
+
+# run sysbench
