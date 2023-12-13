@@ -38,10 +38,14 @@ mysql sakila -e "SELECT COUNT(*) FROM film;"
 # https://webhostinggeeks.com/howto/how-to-use-sysbench-to-test-database-performance-on-a-linux-machine/
 # I did not set a mysql password.
 # prepare the tests by creating a table with 1000000 data entry points.
+# sudo touch mysqlstandalone.txt
+# sudo chmod a+w mysqlstandalone.txt
+
 sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
 
 # Run the tests in order to test performance. and write it to a file.
 sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 > mysqlstandalone
+echo "tests run successfully"
 
 # cleanup after the benchmark.
 sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password
