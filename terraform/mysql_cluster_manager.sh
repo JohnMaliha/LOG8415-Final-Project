@@ -118,11 +118,12 @@ sudo ~/install_secure_mysql.sh
 #remove the script after execution
 #rm -f -v ~/install_secure_mysql.sh
 
-# Increase sleep time to ensure MySQL is ready
+# ---- shameless copy paste form chat-gpt----------------
+# wait to ensure MySQL is ready
 while ! mysqladmin ping --silent; do
     sleep 1
 done
-
+# ---------------------------------------------------------
 ndb_mgm -e show
 
 # install sakila db
