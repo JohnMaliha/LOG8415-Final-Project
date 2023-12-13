@@ -44,7 +44,7 @@ resource "aws_security_group" "final_projet_security_group" {
 
 # create 1 t2.micro mysql standalone instance
 resource "aws_instance" "t2_mysql_standalone" {
-  count = 0 # change back
+  count = 1
   ami = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"

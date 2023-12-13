@@ -8,7 +8,7 @@ sudo apt-get install -y unzip
 #installing mysql
 sudo apt-get install -y mysql-server
 # instal sysbench for benchmarking
-apt-get install sysbench
+sudo apt-get install -y sysbench
 
 cd ~ # ~ = home/ubuntu
 
@@ -32,3 +32,16 @@ mysql < /db/sakila-db/sakila-data.sql
 # creates
 mysql sakila -e "SHOW FULL TABLES;"
 mysql sakila -e "SELECT COUNT(*) FROM film;"
+
+# run sysbench
+# The commands given to us in the tutoriel were not working for me, (decapritaded) therefore i found this:
+# https://webhostinggeeks.com/howto/how-to-use-sysbench-to-test-database-performance-on-a-linux-machine/
+# I did not set a mysql password.
+# prepare the tests by creating a table with 1000000 data entry points.
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
+
+# Run the tests in order to test performance. and write it to a file.
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 > mysqlstandalone
+
+# cleanup after the benchmark.
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password
