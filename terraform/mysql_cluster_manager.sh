@@ -138,8 +138,6 @@ mysql -u root -e  "SOURCE /db/sakila-db/sakila-data.sql"
 mysql -u root -e "USE sakila; SHOW FULL TABLES;"
 mysql -u root -e "USE sakila; SELECT COUNT(*) FROM film;"
 
-ndb_mgm -e show
-
 # grant privileges.
 # mysql -u root -e "CREATE USER 'root' IDENTIFIED BY '0';"
 mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '%'@'%' WITH GRANT OPTION;"

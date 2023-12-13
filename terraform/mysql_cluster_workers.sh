@@ -25,12 +25,3 @@ ndbd -c ip-172-31-28-0.ec2.internal:1186 # 1186 default port
 
 # check status of management data nodes
 ndb_mgm -e show
-
-# run sysbench
-# sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
-
-# # Run the tests in order to test performance. and write it to a file.
-# sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 
-
-# # cleanup after the benchmark.
-# sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password
