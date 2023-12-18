@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-28-0.ec2.internal
+hostname=ip-172-31-26-0.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-28-1.ec2.internal
+hostname=ip-172-31-26-1.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-28-2.ec2.internal
+hostname=ip-172-31-26-2.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-28-3.ec2.internal
+hostname=ip-172-31-26-3.ec2.internal
 nodeid=4
 
 [mysqld]
@@ -118,12 +118,12 @@ sudo ~/install_secure_mysql.sh
 #remove the script after execution
 #rm -f -v ~/install_secure_mysql.sh
 
-# ---- shameless copy paste form chat-gpt----------------
+# ---- shameless copy paste form chat-gpt---------------- #
 # wait to ensure MySQL is ready
 while ! mysqladmin ping --silent; do
     sleep 1
 done
-# ---------------------------------------------------------
+# --------------------------------------------------------- #
 ndb_mgm -e show
 
 # install sakila db
@@ -139,16 +139,14 @@ mysql -u root -e "USE sakila; SHOW FULL TABLES;"
 mysql -u root -e "USE sakila; SELECT COUNT(*) FROM film;"
 
 # grant privileges.
-# mysql -u root -e "CREATE USER 'root' IDENTIFIED BY '0';"
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO '%'@'%' WITH GRANT OPTION;"
-mysql -u root -e "GRANT ALL PRIVILEGES on sakila.* TO 'root'@'localhost';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON sakila.* TO 'root'@'%' IDENTIFIED BY '' WITH GRANT OPTION;"
 mysql -u root -e "FLUSH PRIVILEGES"
 
 # run sysbench
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
 
 # Run the tests in order to test performance. and write it to a file.
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 
 
 # cleanup after the benchmark.
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-host=ip-172-31-28-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password

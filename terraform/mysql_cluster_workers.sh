@@ -21,7 +21,7 @@ sudo apt-get update && sudo apt-get -y install libncurses5
 
 mkdir -p /opt/mysqlcluster/deploy/ndb_data
 # start up Data Node with the address of the manager
-ndbd -c ip-172-31-28-0.ec2.internal:1186 # 1186 default port 
+ndbd -c ip-172-31-26-0.ec2.internal:1186 # 1186 default port 
 
 # check status of management data nodes
 ndb_mgm -e show
