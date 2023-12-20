@@ -103,6 +103,43 @@ resource "aws_instance" "t2_mysql_worker3" {
   } 
 }
 
+# t2 large for the proxy
+resource "aws_instance" "proxy" {
+  count         = 1
+  ami           = "ami-0fc5d935ebf8bc3bc"
+  vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
+  instance_type = "t2.large"
+  user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
+  private_ip = "172.31.26.4"
+    tags = {
+    Name = "t2_proxy"
+  } 
+}
+
+resource "aws_instance" "gatekeeper" {
+  count         = 1
+  ami           = "ami-0fc5d935ebf8bc3bc"
+  vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
+  instance_type = "t2.large"
+  user_data = file("gatekeeper.sh") # used to run script which deploys docker container on each instance
+  private_ip = "172.31.26.5"
+    tags = {
+    Name = "t2_gatekeeper"
+  } 
+}
+
+resource "aws_instance" "trusted_host" {
+  count         = 1
+  ami           = "ami-0fc5d935ebf8bc3bc"
+  vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
+  instance_type = "t2.large"
+  user_data = file("trusted_host.sh") # used to run script which deploys docker container on each instance
+  private_ip = "172.31.26.6"
+    tags = {
+    Name = "t2_trusted_host"
+  } 
+}
+
 # # output the instance ids for the workers
 # output "t2_instance" {
 #   value = [for instance in aws_instance.t2_mysql_workers: instance.id]
