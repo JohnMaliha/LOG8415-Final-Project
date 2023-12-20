@@ -16,15 +16,35 @@ provider "aws" {
 }
 
 # create vpc
-data "aws_vpc" "default" {
-  default = true
+# data "aws_vpc" "default" {
+#   default = true
+# }
+
+# I wanted to use hardcoded addrs. So we definie a vpc.
+resource "aws_vpc" "default" {
+  cidr_block       = "172.31.0.0/16"
+  instance_tenancy = "default"
+  tags = {
+    Name = "main_vpc"
+  }
+}
+
+# the subnet i chose is 24/23 so it goes from X.X.24.255 to X.X.25.255.
+# i wanted to have addresses that end with 0.
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.default.id
+  cidr_block = "172.31.24.0/23"
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "main_subnet"
+  }
 }
 
 # create security group
 resource "aws_security_group" "final_projet_security_group" {
   name        = "final_projet_security_group"
   description = "Allow traffic to the t2 mysql sandalone"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = aws_vpc.default.id
   
   # Define your security group rules here
   ingress {
@@ -61,7 +81,8 @@ resource "aws_instance" "t2_mysql_manager" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"  
   user_data = file("mysql_cluster_manager.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.0" # manually give ips addresses to each instances.
+  subnet_id = aws_subnet.main.id
+  private_ip = "172.31.25.0" # manually give ips addresses to each instances.
     tags = {
     Name = "t2_mysql_cluster_manager"
   } 
@@ -74,18 +95,21 @@ resource "aws_instance" "t2_mysql_worker1" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.1"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.1"
     tags = {
     Name = "t2_mysql_cluster_worker1"
   } 
 }
+
 resource "aws_instance" "t2_mysql_worker2" {
   count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.2"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.2"
     tags = {
     Name = "t2_mysql_cluster_worker2"
   } 
@@ -97,7 +121,8 @@ resource "aws_instance" "t2_mysql_worker3" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.3"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.3"
     tags = {
     Name = "t2_mysql_cluster_worker3"
   } 
@@ -110,7 +135,8 @@ resource "aws_instance" "proxy" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.4"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.4"
     tags = {
     Name = "t2_proxy"
   } 
@@ -122,7 +148,8 @@ resource "aws_instance" "gatekeeper" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("gatekeeper.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.5"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.5"
     tags = {
     Name = "t2_gatekeeper"
   } 
@@ -134,7 +161,8 @@ resource "aws_instance" "trusted_host" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("trusted_host.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.6"
+  subnet_id     = aws_subnet.main.id
+  private_ip = "172.31.25.6"
     tags = {
     Name = "t2_trusted_host"
   } 

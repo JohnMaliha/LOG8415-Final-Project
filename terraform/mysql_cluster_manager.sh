@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-26-0.ec2.internal
+hostname=ip-172-31-25-0.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-26-1.ec2.internal
+hostname=ip-172-31-25-1.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-26-2.ec2.internal
+hostname=ip-172-31-25-2.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-26-3.ec2.internal
+hostname=ip-172-31-25-3.ec2.internal
 nodeid=4
 
 [mysqld]
