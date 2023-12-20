@@ -35,6 +35,7 @@ resource "aws_subnet" "main" {
   vpc_id     = aws_vpc.default.id
   cidr_block = "172.31.24.0/23"
   availability_zone = "us-east-1a"
+  map_public_ip_on_launch = true
   tags = {
     Name = "main_subnet"
   }
@@ -68,6 +69,7 @@ resource "aws_instance" "t2_mysql_standalone" {
   ami = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
+  subnet_id = aws_subnet.main.id
   user_data = file("mysql_standalone.sh") # used to run script which deploys docker container on each instance
   tags = {
     Name = "t2_mysql_standalone"
