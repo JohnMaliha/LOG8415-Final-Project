@@ -61,7 +61,7 @@ resource "aws_instance" "t2_mysql_manager" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"  
   user_data = file("mysql_cluster_manager.sh") # used to run script which deploys docker container on each instance
-  availability_zone = "us-east-1e"
+  availability_zone = "us-east-1b"
   private_ip = "172.31.57.56" # manually give ips addresses to each instances.
     tags = {
     Name = "t2_mysql_cluster_manager"
@@ -75,7 +75,7 @@ resource "aws_instance" "t2_mysql_worker1" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  availability_zone = "us-east-1e"
+  availability_zone = "us-east-1b"
   private_ip = "172.31.57.116"
     tags = {
     Name = "t2_mysql_cluster_worker1"
@@ -87,7 +87,7 @@ resource "aws_instance" "t2_mysql_worker2" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  availability_zone = "us-east-1e"
+  availability_zone = "us-east-1b"
   private_ip = "172.31.57.86"
     tags = {
     Name = "t2_mysql_cluster_worker2"
@@ -100,7 +100,7 @@ resource "aws_instance" "t2_mysql_worker3" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  availability_zone = "us-east-1e"
+  availability_zone = "us-east-1b"
   private_ip = "172.31.57.192"
     tags = {
     Name = "t2_mysql_cluster_worker3"
@@ -114,7 +114,7 @@ resource "aws_instance" "proxy" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
-  # availability_zone = "us-east-1e"
+  availability_zone = "us-east-1d"
   # private_ip = "172.31.31.10"
     tags = {
     Name = "t2_proxy"

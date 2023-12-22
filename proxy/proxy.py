@@ -1,16 +1,15 @@
-from flask import Flask, request
+import random
 import boto3
 import os
-import json
+
+from flask import Flask, request
 from sshtunnel import SSHTunnelForwarder
-import MySQLdb
+from pythonping import ping
 
 from credentials import * 
 
 app = Flask(__name__)
 app.debug =True
-
-PROXY_URL = '100.26.174.95'
 
 session = boto3.Session(
     aws_access_key_id = access_key,
@@ -21,7 +20,6 @@ session = boto3.Session(
 ec2_resource = session.resource('ec2')
 
 # Getting dynamically the ips for the workers and manager.
-# get workersIPS: 
 def get_manager_ips():
     manager_list = []
     workers_id = ec2_resource.instances.filter(Filters=[
@@ -35,38 +33,34 @@ def get_manager_ips():
 # get managerIP
 def get_workers_ips():
     worker_list = []
-    all_workers = ec2_resource.instances.filter(Filters=[
+    all_workers_list = ec2_resource.instances.filter(Filters=[
         {'Name': 'tag:Name', 'Values': ['t2_mysql_cluster_worker1','t2_mysql_cluster_worker2','t2_mysql_cluster_worker3']},
         {'Name': 'instance-state-name', 'Values': ['running']}
     ])
-    for worker in all_workers:
+    for worker in all_workers_list:
         worker_list.append(worker.public_ip_address)
     return worker_list
 
-def get_manager_node_public_ip(instance_id):
-    instance = ec2_resource.Instance(instance_id)
-    return instance.public_ip_address
+all_workers_ip = str(get_workers_ips())
 
-worker = get_workers_ips()
-
-manager = get_workers_ips()[0]
+manager_ip = get_workers_ips()
 
 # Create an ssh tunnel
-def create_ssh_tunnel():
+def initiate_ssh_connection(manager,worker,content):
 
     tunnel = SSHTunnelForwarder(
-        (get_manager_ips(), 22),
+        (manager, 22),
         ssh_username='ubuntu',
-        ssh_pkey= 'LOG8415-Final-Project/proxy/final_assignment.pem',
-        remote_bind_address=(worker, 3306) # worker TO DO FOR ALL THREE
-        local_bind_address= ('localhost', 9000)
+        ssh_pkey='final_assignment.pem',
+        remote_bind_address=(str(manager), 3306),
+        local_bind_address=('localhost', 9000)
     )
     tunnel.start()
 
     try:
         # Establish the SSH tunnel
-        tunnel = create_ssh_tunnel()
-        print(f"Tunnel established. Local port: {tunnel.local_bind_port}")
+        tunnel = initiate_ssh_connection(manager,worker,content)
+        print(f"Tunnel established to {manager} Local port: {3306}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -76,25 +70,30 @@ def create_ssh_tunnel():
             print("Tunnel closed")
 
     return tunnel
-    
-# logic for a direct hit.
-def direct_hit():
+
+
+def send_requests():
     # TO DO
     return 
 
-def random_hit():
-    #TO DO
-    return
 
-def customized_hit():
-    #TO DO
-    return
+# Returns a random worker for random hit
+def get_random_worker(workers):
+    return random.choice(workers)
 
 
-
-
-
-
+def find_speed_of_workers_ms(worker_ip,):
+    try:
+        response = ping(worker_ip, count=1, timeout=1)
+        if response.success():
+            # Calculate the average round-trip time
+            avg_time_ms = response.rtt_avg_ms
+            return avg_time_ms
+        else:
+            return None
+    except Exception as e:
+        print(f"No response was returned: {e}")
+        return None
 
 
 @app.route("/")
@@ -106,23 +105,24 @@ def manager():
     manager_ip = get_manager_ips()
     return "Manager IP: " + str(manager_ip)
 
-
-@app.route('/worker')
+@app.route('/workers')
 def worker():
     worker_ip = get_workers_ips()
     return "worker IP: " + str(worker_ip)
 
-@app.route('/direct')
+@app.route('/direct-hit')
 def direct_hit():
-      answer = direct_hit()
+    return initiate_ssh_connection(manager=str(manager_ip),worker=str(all_workers_ip[0]),content="ff")
 
-# @app.route('/random-hit')
-# def random():
-#     return 
 
-# @app.route('/custom-hit')
-# def customized():
-#     return
+@app.route('/random-hit')
+def random_hit():
+    return get_random_worker(all_workers_ip)
+ 
+
+@app.route('/custom-hit')
+def customized():
+    return
 
 
 
