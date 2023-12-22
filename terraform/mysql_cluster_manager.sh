@@ -39,7 +39,7 @@ port=3306" > my.cnf
 # create the config.ini
 echo -e "# for the master
 [ndb_mgmd]
-hostname=ip-172-31-25-0.ec2.internal
+hostname=ip-172-31-87-57.ec2.internal
 datadir=/opt/mysqlcluster/deploy/ndb_data
 nodeid=1
 
@@ -49,17 +49,17 @@ datadir=/opt/mysqlcluster/deploy/ndb_data
 
 # for slave #1
 [ndbd]
-hostname=ip-172-31-25-1.ec2.internal
+hostname=ip-172-31-57-116.ec2.internal
 nodeid=2
 
 #for slave #2
 [ndbd]
-hostname=ip-172-31-25-2.ec2.internal
+hostname=ip-172-31-57-86.ec2.internal
 nodeid=3
 
 #for slave #3
 [ndbd]
-hostname=ip-172-31-25-3.ec2.internal
+hostname=ip-172-31-57-192.ec2.internal
 nodeid=4
 
 [mysqld]
@@ -143,10 +143,10 @@ mysql -u root -e "GRANT ALL PRIVILEGES ON sakila.* TO 'root'@'%' IDENTIFIED BY '
 mysql -u root -e "FLUSH PRIVILEGES"
 
 # run sysbench
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua prepare --db-driver=mysql --mysql-host=ip-172-31-57-56.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 
 
 # Run the tests in order to test performance. and write it to a file.
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 
+sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --mysql-host=ip-172-31-57-56.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password --table-size=1000000 --threads=6 --time=60 --events=0 
 
 # cleanup after the benchmark.
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-host=ip-172-31-26-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password
+# sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-host=ip-172-31-88-0.ec2.internal --mysql-db=sakila --mysql-user=root --mysql-password

@@ -61,7 +61,8 @@ resource "aws_instance" "t2_mysql_manager" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"  
   user_data = file("mysql_cluster_manager.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.0" # manually give ips addresses to each instances.
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.57.56" # manually give ips addresses to each instances.
     tags = {
     Name = "t2_mysql_cluster_manager"
   } 
@@ -74,7 +75,8 @@ resource "aws_instance" "t2_mysql_worker1" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.1"
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.57.116"
     tags = {
     Name = "t2_mysql_cluster_worker1"
   } 
@@ -85,7 +87,8 @@ resource "aws_instance" "t2_mysql_worker2" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.2"
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.57.86"
     tags = {
     Name = "t2_mysql_cluster_worker2"
   } 
@@ -97,7 +100,8 @@ resource "aws_instance" "t2_mysql_worker3" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_cluster_workers.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.3"
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.57.192"
     tags = {
     Name = "t2_mysql_cluster_worker3"
   } 
@@ -110,31 +114,32 @@ resource "aws_instance" "proxy" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.4"
+  # availability_zone = "us-east-1e"
+  # private_ip = "172.31.31.10"
     tags = {
     Name = "t2_proxy"
   } 
 }
 
 resource "aws_instance" "gatekeeper" {
-  count         = 1
+  count         = 0
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("gatekeeper.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.5"
+  # private_ip = "172.31.31.20"
     tags = {
     Name = "t2_gatekeeper"
   } 
 }
 
 resource "aws_instance" "trusted_host" {
-  count         = 1
+  count         = 0
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("trusted_host.sh") # used to run script which deploys docker container on each instance
-  private_ip = "172.31.26.6"
+  # private_ip = "172.31.31.21"
     tags = {
     Name = "t2_trusted_host"
   } 
