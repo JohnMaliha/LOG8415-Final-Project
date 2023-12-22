@@ -47,20 +47,20 @@ manager_ip = get_workers_ips()
 
 # Create an ssh tunnel
 def initiate_ssh_connection(manager,worker,content):
-
+    manager_ip = str(manager)
     tunnel = SSHTunnelForwarder(
-        (manager, 22),
+        (manager_ip, 22),
         ssh_username='ubuntu',
         ssh_pkey='final_assignment.pem',
-        remote_bind_address=(str(manager), 3306),
+        remote_bind_address=(manager_ip, 3306),
         local_bind_address=('localhost', 9000)
     )
     tunnel.start()
 
     try:
         # Establish the SSH tunnel
-        tunnel = initiate_ssh_connection(manager,worker,content)
-        print(f"Tunnel established to {manager} Local port: {3306}")
+        tunnel = initiate_ssh_connection(manager_ip,worker,content)
+        print(f"Tunnel established to {manager_ip} Local port: {3306}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -112,7 +112,7 @@ def worker():
 
 @app.route('/direct-hit')
 def direct_hit():
-    return initiate_ssh_connection(manager=str(manager_ip),worker=str(all_workers_ip[0]),content="ff")
+    return initiate_ssh_connection(manager=manager_ip,worker=str(all_workers_ip[0]),content="ff")
 
 
 @app.route('/random-hit')
