@@ -1,6 +1,7 @@
 import random
 import boto3
 import os
+import pymysql
 
 from flask import Flask, request
 from sshtunnel import SSHTunnelForwarder
@@ -41,41 +42,46 @@ def get_workers_ips():
         worker_list.append(worker.public_ip_address)
     return worker_list
 
-all_workers_ip = str(get_workers_ips())
-
-manager_ip = get_workers_ips()
-
-# Create an ssh tunnel
-def initiate_ssh_connection(manager,worker,content):
-    manager_ip = str(manager)
-    tunnel = SSHTunnelForwarder(
-        (manager_ip, 22),
+# Create an ssh tunnel and establish connection to the servers. 
+# Takes three params. ip of the manager nodes and data nodes. last param is the query.
+# the only param we can decide is the sql query.
+def ssh_connection_handler(manager_ip,worker_ip,sql_query):
+    resp = "Response from the server :"
+    if not manager_ip:
+        raise Exception("Manager IP is required")
+    
+    with SSHTunnelForwarder(
+        (worker_ip,22),
         ssh_username='ubuntu',
         ssh_pkey='final_assignment.pem',
         remote_bind_address=(manager_ip, 3306),
-        local_bind_address=('localhost', 9000)
+        local_bind_address=('localhost', 5000)
+    ) as tunnel:
+        
+        # connect to the sakila db using mysql via the tunnel
+        connection = pymysql.connect(
+            host=manager_ip, 
+            user='root',
+            password='',
+            db='sakila',
+            port=3306,
+            autocommit=True
     )
-    tunnel.start()
 
     try:
-        # Establish the SSH tunnel
-        tunnel = initiate_ssh_connection(manager_ip,worker,content)
-        print(f"Tunnel established to {manager_ip} Local port: {3306}")
-
+        with connection.cursor() as cursor:
+            print(f"Connection: Tunnel established to {manager_ip} Local port: {3306}")
+            cursor.execute(sql_query)
+            response = cursor.fetchall()
+            for row in response: 
+                resp = resp + str(row)
+                print(resp)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error establishing SSH tunnel: {e}")
     finally:
-        if tunnel:
-            tunnel.stop()
-            print("Tunnel closed")
-
-    return tunnel
-
-
-def send_requests():
-    # TO DO
-    return 
-
+        connection.close()
+        print("Tunnel closed")
+    return resp
 
 # Returns a random worker for random hit
 def get_random_worker(workers):
@@ -95,10 +101,18 @@ def find_speed_of_workers_ms(worker_ip,):
         print(f"No response was returned: {e}")
         return None
 
+def find_fastest_worker_node():
+    #TODO 
+    return
+
+
+def to_string_ip(ip_address):
+    return str(ip_address)
+
 
 @app.route("/")
 def default():
-    return 'Default'
+    return '<h1> Select one of the above proxy implementation : 1) direct-hit 2) random-hit 3) customized-hit </h1>'
 
 @app.route('/manager')
 def manager():
@@ -110,24 +124,39 @@ def worker():
     worker_ip = get_workers_ips()
     return "worker IP: " + str(worker_ip)
 
+# ----------------- Proxy methods ------------------------------------# 
+# For all the proxy patterns implementations here is an example of the url : 
+# http://ADDRESS:PORT/PROXY_METHOD?query=YOURSQLQUERY;
+
+# Direct-hit proxy : imedietly send the request to the master(manager) node. 
 @app.route('/direct-hit')
 def direct_hit():
-    return initiate_ssh_connection(manager=manager_ip,worker=str(all_workers_ip[0]),content="ff")
+    query_params = request.args.get('query')
+    manager_ip = to_string_ip(get_manager_ips())
+    print(f"Proxy direct-hit \n Sending request to : {manager_ip} with query : {query_params}")
+    return ssh_connection_handler(manager_ip=manager_ip,worker_ip=manager_ip,sql_query=query_params)
 
-
+# Random-hit proxy is randomly choosing a worker node and sending the request to that node.
 @app.route('/random-hit')
 def random_hit():
-    return get_random_worker(all_workers_ip)
+    query_params = request.args.get('query')
+    manager_ip = to_string_ip(get_manager_ips())
+    worker_ip = get_random_worker(get_workers_ips())
+    print(f"Proxy random-hit \n Sending request to worker : {worker_ip} where manager node : {manager_ip} with query : {query_params}")
+    return ssh_connection_handler(manager_ip=manager_ip,worker_ip=worker_ip,sql_query=query_params)
  
 
+# Customized-hit proxy is choosing the worker node with the lowest latency and sending the request to that worker node.
 @app.route('/custom-hit')
 def customized():
-    return
+    query_params = request.args.get('query')
+    manager_ip = to_string_ip(get_manager_ips())
+    worker_ip = ""
+    ping_time = ''
 
-
-
-
-
+    print(f"Proxy custom-hit \n Sending request to fastest worker : {worker_ip} with ping response time : {ping_time} where manager node : {manager_ip} with query : {query_params}")
+    return ssh_connection_handler(manager_ip=manager_ip,worker_ip=worker_ip,sql_query=query_params)
+    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000)
