@@ -1,21 +1,27 @@
 #!/bin/bash
 
+exec > /home/ubuntu/logs.log 2>&1
+
 # install docker
-yum update -y
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg
 
-sudo yum install -y yum-utils
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-yum install -y docker
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-sudo usermod -a -G docker ec2-user
+# Add the repository to Apt sources:
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
 
-# start docker
-sudo systemctl start docker
+# Install lastest version
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # get our dockerfile to run the container
-sudo docker pull therealflash/proxy:latest
+sudo docker pull therealflash/proxy
 
-# get the instance id
-export INSTANCE_ID=$(ec2-metadata --instance-id)
-
-sudo docker run -e INSTANCE_ID="$INSTANCE_ID" -p 80:5000 therealflash/proxy:latest
+sudo docker run -p 80:5000 therealflash/proxy

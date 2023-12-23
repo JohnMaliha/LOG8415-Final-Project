@@ -49,6 +49,7 @@ resource "aws_instance" "t2_mysql_standalone" {
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.micro"
   user_data = file("mysql_standalone.sh") # used to run script which deploys docker container on each instance
+  availability_zone = "us-east-1e"
   tags = {
     Name = "t2_mysql_standalone"
   }
@@ -126,24 +127,26 @@ resource "aws_instance" "proxy" {
 }
 
 resource "aws_instance" "gatekeeper" {
-  count         = 0
+  count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("gatekeeper.sh") # used to run script which deploys docker container on each instance
-  # private_ip = "172.31.31.20"
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.50.248"
     tags = {
     Name = "t2_gatekeeper"
   } 
 }
 
 resource "aws_instance" "trusted_host" {
-  count         = 0
+  count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
   instance_type = "t2.large"
   user_data = file("trusted_host.sh") # used to run script which deploys docker container on each instance
-  # private_ip = "172.31.31.21"
+  availability_zone = "us-east-1e"
+  private_ip = "172.31.57.52"
     tags = {
     Name = "t2_trusted_host"
   } 

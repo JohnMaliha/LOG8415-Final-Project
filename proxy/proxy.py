@@ -70,14 +70,14 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
 
     try:
         with connection.cursor() as cursor:
-            print(f"Connection: Tunnel established to {manager_ip} Local port: {3306}")
+            print(f"Connection: Tunnel established to manager node {manager_ip} and data node : {worker_ip} Local port: {3306}. The query is {sql_query}")
             cursor.execute(sql_query)
             response = cursor.fetchall()
             for row in response: 
                 resp = resp + str(row)
                 print(resp)
     except Exception as e:
-        print(f"Error establishing SSH tunnel: {e}")
+        print(f"Connection : error establishing SSH tunnel: {e}")
     finally:
         connection.close()
         print("Connection : Tunnel closed")
