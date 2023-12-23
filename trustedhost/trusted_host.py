@@ -20,9 +20,11 @@ ec2_resource = session.resource('ec2')
 
 
 
+
+
 @app.route("/")
 def default():
-    return '<h1> Gatekeeper. </h1>'
+    return '<h1> Trusted host. </h1>'
 
 
 

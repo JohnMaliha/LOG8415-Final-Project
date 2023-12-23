@@ -5,7 +5,7 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-ENV FLASK_APP=gatekeeper.py
+ENV FLASK_APP=trusted_host.py
 
 EXPOSE 5000
 
