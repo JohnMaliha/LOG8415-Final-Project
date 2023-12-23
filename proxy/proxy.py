@@ -94,7 +94,7 @@ def find_speed_of_workers_ms(worker_ip):
         if response.success():
             # attrib rrt_avg_ms returns the ping time : https://stackoverflow.com/questions/67476432/pythong-get-ping-time-using-pythonping-module
             avg_time_ms = response.rtt_avg_ms
-            print(avg_time_ms)
+            # print(avg_time_ms)
             return avg_time_ms
         else:
             return None
