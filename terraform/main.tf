@@ -120,7 +120,6 @@ resource "aws_instance" "proxy" {
   user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
   availability_zone = "us-east-1e"
   key_name = "final_assignment"
-  # private_ip = "172.31.31.10"
     tags = {
     Name = "t2_proxy"
   } 

@@ -55,7 +55,7 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
         ssh_username='ubuntu',
         ssh_pkey='final_assignment.pem',
         remote_bind_address=(manager_ip, 3306),
-        local_bind_address=('localhost', 5000)
+        #local_bind_address=('0.0.0.0', 5000)
     ) as tunnel:
         
         # connect to the sakila db using mysql via the tunnel
@@ -80,7 +80,7 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
         print(f"Error establishing SSH tunnel: {e}")
     finally:
         connection.close()
-        print("Tunnel closed")
+        print("Connection : Tunnel closed")
     return resp
 
 # Returns a random worker for random hit
@@ -92,7 +92,8 @@ def find_speed_of_workers_ms(worker_ip):
     try:
         response = ping(worker_ip, count=1, timeout=1)
         if response.success():
-            # attrib rrt_avg_ms returns the ping time : https://stackoverflow.com/questions/67476432/pythong-get-ping-time-using-pythonping-module
+            # The attrib rrt_avg_ms returns the ping time.
+            # https://stackoverflow.com/questions/67476432/pythong-get-ping-time-using-pythonping-module
             avg_time_ms = response.rtt_avg_ms
             # print(avg_time_ms)
             return avg_time_ms
