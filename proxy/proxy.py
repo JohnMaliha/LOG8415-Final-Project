@@ -62,7 +62,7 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
         connection = pymysql.connect(
             host=manager_ip, 
             user='root',
-            password='',
+            password='', # i did not set any passwords for my sakila db.
             db='sakila',
             port=3306,
             autocommit=True
@@ -88,12 +88,13 @@ def get_random_worker(workers):
     return random.choice(workers)
 
 
-def find_speed_of_workers_ms(worker_ip,):
+def find_speed_of_workers_ms(worker_ip):
     try:
         response = ping(worker_ip, count=1, timeout=1)
         if response.success():
-            # Calculate the average round-trip time
+            # attrib rrt_avg_ms returns the ping time : https://stackoverflow.com/questions/67476432/pythong-get-ping-time-using-pythonping-module
             avg_time_ms = response.rtt_avg_ms
+            print(avg_time_ms)
             return avg_time_ms
         else:
             return None
@@ -101,14 +102,21 @@ def find_speed_of_workers_ms(worker_ip,):
         print(f"No response was returned: {e}")
         return None
 
-def find_fastest_worker_node():
-    #TODO 
-    return
+# takes all the workers and mesures their response time. 
+# returns the fastest worker.
+def find_fastest_worker_node(all_workers):
+    min_avg_time = float('inf')
 
+    for worker in all_workers:
+        avg_time = find_speed_of_workers_ms(worker)
+        if avg_time < min_avg_time:
+            min_avg_time = avg_time
+            fastest_node = worker
+    return fastest_node,min_avg_time
 
+# convert the ip address to string
 def to_string_ip(ip_address):
     return str(ip_address)
-
 
 @app.route("/")
 def default():
@@ -151,11 +159,11 @@ def random_hit():
 def customized():
     query_params = request.args.get('query')
     manager_ip = to_string_ip(get_manager_ips())
-    worker_ip = ""
-    ping_time = ''
+    worker_ip_list = get_workers_ips()
+    fastest_worker_ip,ping_time = find_fastest_worker_node(worker_ip_list)
 
-    print(f"Proxy custom-hit \n Sending request to fastest worker : {worker_ip} with ping response time : {ping_time} where manager node : {manager_ip} with query : {query_params}")
-    return ssh_connection_handler(manager_ip=manager_ip,worker_ip=worker_ip,sql_query=query_params)
+    print(f"Proxy custom-hit \n Sending request to fastest worker : {fastest_worker_ip} with ping response time : {ping_time} where manager node : {manager_ip} with query : {query_params}")
+    return ssh_connection_handler(manager_ip=manager_ip,worker_ip=fastest_worker_ip,sql_query=query_params)
     
 
 if __name__ == "__main__":
