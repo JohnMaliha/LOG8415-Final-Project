@@ -23,7 +23,7 @@ data "aws_vpc" "default" {
 # create security group
 resource "aws_security_group" "final_projet_security_group" {
   name        = "final_projet_security_group"
-  description = "Allow traffic to the t2 mysql sandalone"
+  description = "Allow traffic to the t2 mysql"
   vpc_id      = data.aws_vpc.default.id
   
   # Define your security group rules here
@@ -41,6 +41,69 @@ resource "aws_security_group" "final_projet_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+# resource "aws_security_group" "final_projet_security_group_trusted_host" {
+#   name        = "final_projet_security_group_trusted_host"
+#   description = "Allow traffic to the trusted group"
+#   vpc_id      = data.aws_vpc.default.id
+  
+#   # Define your security group rules here
+#   ingress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
+
+# resource "aws_security_group" "final_projet_security_group_proxy" {
+#   name        = "final_projet_security_group_proxy"
+#   description = "Allow traffic to the proxy"
+#   vpc_id      = data.aws_vpc.default.id
+  
+#   # Define your security group rules here
+#   ingress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
+
+# resource "aws_security_group" "final_projet_security_group_gatekeeper" {
+#   name        = "final_projet_security_group_gatekeeper"
+#   description = "Allow traffic to the gatekeeper"
+#   vpc_id      = data.aws_vpc.default.id
+  
+#   # Define your security group rules here
+#   ingress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 # create 1 t2.micro mysql standalone instance
 resource "aws_instance" "t2_mysql_standalone" {

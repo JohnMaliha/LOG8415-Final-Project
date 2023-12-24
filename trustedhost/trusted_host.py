@@ -35,7 +35,7 @@ def get_proxy_address_to_dns():
         proxy_list.append(proxy.public_ip_address)
     return modify_ip_to_dns(proxy_list[0])
 
-def ssh_handler(proxy_dns, proxy_type ,sql_query):
+def ssh_handler(proxy_dns, proxy_type, sql_query):
     response = "Response from proxy: \n"
 
     with SSHTunnelForwarder(

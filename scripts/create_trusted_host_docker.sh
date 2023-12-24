@@ -1,5 +1,5 @@
 cd ..
-cd ./gatekeeper
+cd ./trustedhost
 
 echo "Generating docker image"
 docker build -t trustedhost .
