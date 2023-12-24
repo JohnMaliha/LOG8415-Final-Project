@@ -20,7 +20,8 @@ data "aws_vpc" "default" {
   default = true
 }
 
-# create security group
+# create security group for each instances. I allow every connections and ports (simplicity purposes)
+# In a real world senario it should be safer.
 resource "aws_security_group" "final_projet_security_group" {
   name        = "final_projet_security_group"
   description = "Allow traffic to the t2 mysql"
@@ -42,6 +43,8 @@ resource "aws_security_group" "final_projet_security_group" {
   }
 }
 
+ # I created a security group that allows only via tcp the gatekeeper to connect to the trusted host.
+ # Port 22 (tcp) and port 80 (docker runs on port 80)
 resource "aws_security_group" "final_projet_security_group_trusted_host" {
   name        = "final_projet_security_group_trusted_host"
   description = "Allow traffic to the trusted group"
@@ -146,12 +149,13 @@ resource "aws_instance" "proxy" {
   instance_type = "t2.large"
   user_data = file("proxy.sh") # used to run script which deploys docker container on each instance
   availability_zone = "us-east-1e"
-  key_name = "final_assignment"
+  key_name = "final_assignment" # links to the ssh key. 
     tags = {
     Name = "t2_proxy"
   } 
 }
 
+# create 1 t2.large instance for the gatekeeper.
 resource "aws_instance" "gatekeeper" {
   count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
@@ -167,6 +171,8 @@ resource "aws_instance" "gatekeeper" {
   } 
 }
 
+# create 1 t2.large instance for the trusted host. 
+# The security group differs from the others because we want it to be secure (only the gatekeeper can send requests to the trusted host.)
 resource "aws_instance" "trusted_host" {
   count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
@@ -180,8 +186,3 @@ resource "aws_instance" "trusted_host" {
     Name = "t2_trusted_host"
   } 
 }
-
-# # output the instance ids for the workers
-# output "t2_instance" {
-#   value = [for instance in aws_instance.t2_mysql_workers: instance.id]
-# }

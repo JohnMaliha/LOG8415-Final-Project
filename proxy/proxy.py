@@ -9,7 +9,7 @@ from pythonping import ping
 from credentials import * 
 
 app = Flask(__name__)
-app.debug =True
+app.debug =False # for debugging
 
 session = boto3.Session(
     aws_access_key_id = access_key,

@@ -7,7 +7,7 @@ import requests
 from credentials import * 
 
 app = Flask(__name__)
-app.debug =True
+app.debug =False # for debugging
 
 
 session = boto3.Session(
