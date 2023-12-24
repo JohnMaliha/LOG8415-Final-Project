@@ -46,7 +46,7 @@ def ssh_handler(proxy_dns, proxy_type, sql_query):
     ) as tunnel:
         try:
             res = requests.get(f'http://{proxy_dns}/{proxy_type}?query={sql_query}')
-            # print(res.text)
+            print(res.text)
             response = response + ' ' + str(res.text)
 
         except Exception as e:

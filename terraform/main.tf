@@ -42,68 +42,31 @@ resource "aws_security_group" "final_projet_security_group" {
   }
 }
 
-# resource "aws_security_group" "final_projet_security_group_trusted_host" {
-#   name        = "final_projet_security_group_trusted_host"
-#   description = "Allow traffic to the trusted group"
-#   vpc_id      = data.aws_vpc.default.id
+resource "aws_security_group" "final_projet_security_group_trusted_host" {
+  name        = "final_projet_security_group_trusted_host"
+  description = "Allow traffic to the trusted group"
+  vpc_id      = data.aws_vpc.default.id
   
-#   # Define your security group rules here
-#   ingress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-# resource "aws_security_group" "final_projet_security_group_proxy" {
-#   name        = "final_projet_security_group_proxy"
-#   description = "Allow traffic to the proxy"
-#   vpc_id      = data.aws_vpc.default.id
-  
-#   # Define your security group rules here
-#   ingress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-# resource "aws_security_group" "final_projet_security_group_gatekeeper" {
-#   name        = "final_projet_security_group_gatekeeper"
-#   description = "Allow traffic to the gatekeeper"
-#   vpc_id      = data.aws_vpc.default.id
-  
-#   # Define your security group rules here
-#   ingress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+  # Define your security group rules here
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.50.248/32"] # private ip of the gatekeeper. the trusted host one gets requests from the gatekeeper.
+  }
+   ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["172.31.50.248/32"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 # create 1 t2.micro mysql standalone instance
 resource "aws_instance" "t2_mysql_standalone" {
@@ -197,6 +160,8 @@ resource "aws_instance" "gatekeeper" {
   user_data = file("gatekeeper.sh") # used to run script which deploys docker container on each instance
   availability_zone = "us-east-1e"
   private_ip = "172.31.50.248"
+  key_name = "final_assignment"
+
     tags = {
     Name = "t2_gatekeeper"
   } 
@@ -205,11 +170,12 @@ resource "aws_instance" "gatekeeper" {
 resource "aws_instance" "trusted_host" {
   count         = 1
   ami           = "ami-0fc5d935ebf8bc3bc"
-  vpc_security_group_ids = [aws_security_group.final_projet_security_group.id]
+  vpc_security_group_ids = [aws_security_group.final_projet_security_group_trusted_host.id]
   instance_type = "t2.large"
   user_data = file("trusted_host.sh") # used to run script which deploys docker container on each instance
   availability_zone = "us-east-1e"
   private_ip = "172.31.57.52"
+  key_name = "final_assignment"
     tags = {
     Name = "t2_trusted_host"
   } 
