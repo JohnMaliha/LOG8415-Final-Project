@@ -22,6 +22,6 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # get our dockerfile to run the container
-sudo docker pull therealflash/trustedHost
+sudo docker pull therealflash/trustedhost
 
-sudo docker run -p 80:5000 therealflash/trustedHost
+sudo docker run -p 80:5000 therealflash/trustedhost

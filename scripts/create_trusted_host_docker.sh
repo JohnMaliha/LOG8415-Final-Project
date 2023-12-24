@@ -2,8 +2,8 @@ cd ..
 cd ./gatekeeper
 
 echo "Generating docker image"
-docker build -t trustedHost .
-docker tag trustedHost therealflash/trustedHost
+docker build -t trustedhost .
+docker tag trustedhost therealflash/trustedhost
 echo "Uploading docker image"
-docker push therealflash/trustedHost
+docker push therealflash/trustedhost
 echo "Docker task completed successfully!"

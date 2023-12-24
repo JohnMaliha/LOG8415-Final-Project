@@ -9,7 +9,7 @@ from pythonping import ping
 from credentials import * 
 
 app = Flask(__name__)
-app.debug =False
+app.debug =True
 
 session = boto3.Session(
     aws_access_key_id = access_key,
@@ -45,7 +45,7 @@ def get_workers_ips():
 # Takes three params. ip of the manager nodes and data nodes. last param is the query.
 # the only param we can decide is the sql query.
 def ssh_connection_handler(manager_ip,worker_ip,sql_query):
-    resp = "Response from the server :"
+    resp = "Response from the manager/data nodes : \n"
     if not manager_ip:
         raise Exception("Manager IP is required")
     
@@ -69,17 +69,17 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
 
     try:
         with connection.cursor() as cursor:
-            print(f"Connection: Tunnel established to manager node {manager_ip} and data node : {worker_ip} Local port: {3306}. The query is {sql_query}")
+            print(f"Connection to data-master nodes : Tunnel established to manager node {manager_ip} and data node : {worker_ip} Local port: {3306}. The query is {sql_query}")
             cursor.execute(sql_query)
             response = cursor.fetchall()
             for row in response: 
                 resp = resp + str(row)
                 print(resp)
     except Exception as e:
-        print(f"Connection : error establishing SSH tunnel: {e}")
+        print(f"Connection to data-master nodes : error establishing SSH tunnel: {e}")
     finally:
         connection.close()
-        print("Connection : Tunnel closed")
+        print("Connection to data-master nodes : Tunnel closed")
     return resp
 
 # Returns a random worker for random hit
@@ -120,7 +120,7 @@ def to_string_ip(ip_address):
 
 @app.route("/")
 def default():
-    return '<h1> Select one of the above proxy implementation : 1) direct-hit 2) random-hit 3) customized-hit </h1>'
+    return '<h1> Select one of the above proxy implementation : 1) /direct-hit 2) /random-hit 3) /customized-hit </h1>'
 
 @app.route('/manager')
 def manager():
@@ -161,7 +161,6 @@ def customized():
     manager_ip = to_string_ip(get_manager_ips())
     worker_ip_list = get_workers_ips()
     fastest_worker_ip,ping_time = find_fastest_worker_node(worker_ip_list)
-
     print(f"Proxy custom-hit \n Sending request to fastest worker : {fastest_worker_ip} with ping response time : {ping_time} where manager node : {manager_ip} with query : {query_params}")
     return ssh_connection_handler(manager_ip=manager_ip,worker_ip=fastest_worker_ip,sql_query=query_params)
     
