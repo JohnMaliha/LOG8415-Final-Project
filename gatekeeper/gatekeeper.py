@@ -44,9 +44,10 @@ def ssh_handler(trusted_host_dns, proxy_type, sql_query):
         remote_bind_address=(trusted_host_dns, 80)
     ) as tunnel:
         try:
-            # we send a request to the trusted host. The trusted host, will redirected it to the proxy.
-            res = requests.get(f'http://{trusted_host_dns}/trusted_host?proxy_type={proxy_type}&query={sql_query}') 
-            print(f'http://{trusted_host_dns}/trusted_host?proxy_type={proxy_type}&query={sql_query}')
+            dns = f'http://{trusted_host_dns}/trusted_host?proxy_type={proxy_type}&query={sql_query}'
+            # send a request to the trusted host via http. The trusted host, will redirected it to the proxy.
+            res = requests.get(dns) 
+            # print(f'http://{trusted_host_dns}/trusted_host?proxy_type={proxy_type}&query={sql_query}')
             print(res.text)
             response = response + ' ' + str(res.text)
 

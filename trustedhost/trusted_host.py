@@ -45,7 +45,8 @@ def ssh_handler(proxy_dns, proxy_type, sql_query):
         remote_bind_address=(proxy_dns, 5050)
     ) as tunnel:
         try:
-            res = requests.get(f'http://{proxy_dns}/{proxy_type}?query={sql_query}')
+            dns = f'http://{proxy_dns}/{proxy_type}?query={sql_query}'
+            res = requests.get(dns)
             print(res.text)
             response = response + ' ' + str(res.text)
 
