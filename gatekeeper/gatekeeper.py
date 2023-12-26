@@ -41,7 +41,7 @@ def ssh_handler(trusted_host_dns, proxy_type, sql_query):
         (trusted_host_dns,22),
         ssh_username='ubuntu',
         ssh_pkey='final_assignment.pem',
-        remote_bind_address=(trusted_host_dns, 80)
+        remote_bind_address=(trusted_host_dns, 80) # we will use http to send the request.
     ) as tunnel:
         try:
             dns = f'http://{trusted_host_dns}/trusted_host?proxy_type={proxy_type}&query={sql_query}'
@@ -62,7 +62,7 @@ def default():
     return get_trusted_host_address_to_dns()
 
 @app.route('/gatekeeper', methods=['GET'])
-def sending_to_proxy():
+def sending_to_trusted_host():
     proxy_type = request.args.get('proxy_type')
     params = request.args.get('query')
     trusted_host_dns = get_trusted_host_address_to_dns()

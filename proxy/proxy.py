@@ -72,7 +72,7 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
             print(f"Connection to data-master nodes : Tunnel established to manager node {manager_ip} and data node : {worker_ip} Local port: {3306}. The query is {sql_query}")
             cursor.execute(sql_query)
             response = cursor.fetchall()
-            for row in response: 
+            for row in response: # look into response.json() and json.dumps()
                 resp = resp + str(row)
                 print(resp)
     except Exception as e:
@@ -163,7 +163,6 @@ def customized():
     fastest_worker_ip,ping_time = find_fastest_worker_node(worker_ip_list)
     print(f"Proxy custom-hit \n Sending request to fastest worker : {fastest_worker_ip} with ping response time : {ping_time} where manager node : {manager_ip} with query : {query_params}")
     return ssh_connection_handler(manager_ip=manager_ip,worker_ip=fastest_worker_ip,sql_query=query_params)
-    
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000)

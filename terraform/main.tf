@@ -45,6 +45,7 @@ resource "aws_security_group" "final_projet_security_group" {
 
  # I created a security group that allows only via tcp the gatekeeper to connect to the trusted host.
  # Port 22 (tcp) and port 80 (docker runs on port 80)
+ # I have 2 ingress rules because i want to open only port 22 and only port 80.
 resource "aws_security_group" "final_projet_security_group_trusted_host" {
   name        = "final_projet_security_group_trusted_host"
   description = "Allow traffic to the trusted group"
@@ -58,7 +59,7 @@ resource "aws_security_group" "final_projet_security_group_trusted_host" {
     cidr_blocks = ["172.31.50.248/32"] # private ip of the gatekeeper. the trusted host one gets requests from the gatekeeper.
   }
    ingress {
-    from_port   = 80
+    from_port   = 80 # for when we bind the trusted host via http. (remote_bind_address=(trusted_host_dns, 80))
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["172.31.50.248/32"]

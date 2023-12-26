@@ -48,4 +48,4 @@ sudo sysbench /usr/share/sysbench/oltp_read_write.lua run --db-driver=mysql --my
 echo "tests run successfully"
 
 # cleanup after the benchmark.
-sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password
+# sudo sysbench /usr/share/sysbench/oltp_read_write.lua cleanup --db-driver=mysql --mysql-db=sakila --mysql-user=root --mysql-password
