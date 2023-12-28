@@ -21,6 +21,15 @@ ec2_resource = session.resource('ec2')
 
 # Getting dynamically the ips for the workers and manager.
 def get_manager_ips():
+    """
+    Retrieve the IP address of the first running AWS EC2 instance tagged as a MySQL cluster manager.
+
+    This function filters AWS EC2 instances with the tag 't2_mysql_cluster_manager' and 
+    state 'running', and extracts the public IP address of the first instance in this filtered list.
+
+    Returns:
+    str: The public IP address of the first (and the only one) running  MySQL cluster manager instance.
+    """
     manager_list = []
     workers_id = ec2_resource.instances.filter(Filters=[
         {'Name': 'tag:Name', 'Values': ['t2_mysql_cluster_manager']}, 
@@ -32,6 +41,16 @@ def get_manager_ips():
 
 # get managerIP
 def get_workers_ips():
+    """
+    Retrieve the IP addresses of running AWS EC2 instances tagged as MySQL cluster workers.
+
+    This function filters AWS EC2 instances with tags 't2_mysql_cluster_worker1', 
+    't2_mysql_cluster_worker2', and 't2_mysql_cluster_worker3' in a 'running' state, 
+    and collects their public IP addresses.
+
+    Returns:
+    list: A list of public IP addresses of the running MySQL cluster worker instances.
+    """
     worker_list = []
     all_workers_list = ec2_resource.instances.filter(Filters=[
         {'Name': 'tag:Name', 'Values': ['t2_mysql_cluster_worker1','t2_mysql_cluster_worker2','t2_mysql_cluster_worker3']},
@@ -45,6 +64,21 @@ def get_workers_ips():
 # Takes three params. ip of the manager nodes and data nodes. last param is the query.
 # the only param we can decide is the sql query.
 def ssh_connection_handler(manager_ip,worker_ip,sql_query):
+    """
+    Establish an SSH tunnel and execute an SQL query on a MySQL cluster.
+
+    This function sets up an SSH tunnel to a specified worker node, then connects to a MySQL 
+    database on the manager node and executes the provided SQL query. It returns the query response.
+
+    Args:
+    manager_ip (str): The IP address of the manager node.
+    worker_ip (str): The IP address of the worker node to tunnel through.
+    sql_query (str): The SQL query to execute.
+
+    Returns:
+    str: The response from executing the SQL query.
+    """
+
     resp = "Response from the manager/data nodes : \n"
     if not manager_ip:
         raise Exception("Manager IP is required")
@@ -86,10 +120,32 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
 
 # Returns a random worker for random hit
 def get_random_worker(workers):
+    """
+    Select a random worker IP address from a list of workers. Its for the random-hit proxy implementation
+
+    Args:
+    workers (list): A list of worker IP addresses.
+
+    Returns:
+    str: A randomly selected worker IP address from the list.
+    """
     return random.choice(workers)
 
 
 def find_speed_of_workers_ms(worker_ip):
+    """
+    Measure the ping response time of a worker node in milliseconds.
+
+    This function sends a ping to the specified worker node IP address and measures the 
+    average round-trip time in milliseconds.
+
+    Args:
+    worker_ip (str): The IP address of the worker node.
+
+    Returns:
+    float or None: The average round-trip time in milliseconds, or None if the ping fails.
+    """
+
     try:
         response = ping(worker_ip, count=1, timeout=1)
         if response.success():
@@ -107,6 +163,19 @@ def find_speed_of_workers_ms(worker_ip):
 # takes all the workers and mesures their response time. 
 # returns the fastest worker.
 def find_fastest_worker_node(all_workers):
+    """
+    Identify the worker node with the lowest latency.
+
+    This function iterates over a list of worker nodes, pings each, and identifies 
+    the node with the lowest average round-trip time.
+
+    Args:
+    all_workers (list): A list of worker node IP addresses.
+
+    Returns:
+    tuple: A tuple containing the IP address of the fastest worker node and its ping time.
+    """
+
     min_avg_time = float('inf')
 
     for worker in all_workers:
@@ -118,19 +187,53 @@ def find_fastest_worker_node(all_workers):
 
 # convert the ip address to string
 def to_string_ip(ip_address):
+    """
+    Convert an IP address to a string format.
+
+    Args:
+    ip_address: The IP address to convert.
+
+    Returns:
+    str: The IP address in string format.
+    """
+
     return str(ip_address)
 
 @app.route("/")
 def default():
+    """
+    Default route handler for the web application.
+
+    This route returns an HTML string that lists the available proxy implementation options.
+
+    Returns:
+    str: HTML content describing the available options.
+    """
     return '<h1> Select one of the above proxy implementation : 1) /direct-hit 2) /random-hit 3) /customized-hit </h1>'
 
 @app.route('/manager')
 def manager():
+    """
+    manager route for the web application.
+
+    This route returns the manager IP.
+
+    Returns:
+    str: Manager IP's public ip address.
+    """
     manager_ip = get_manager_ips()
     return "Manager IP: " + str(manager_ip)
 
 @app.route('/workers')
 def worker():
+    """
+    manager route for the web application.
+
+    This route returns the manager IP.
+
+    Returns:
+    str: Manager IP's public ip address.
+    """
     worker_ip = get_workers_ips()
     return "worker IP: " + str(worker_ip)
 
@@ -141,6 +244,16 @@ def worker():
 # Direct-hit proxy : immediately send the request to the master(manager) node. 
 @app.route('/direct-hit')
 def direct_hit():
+    """
+    Handle the 'direct-hit' proxy method.
+
+    This route processes a direct-hit request by taking an SQL query parameter,
+    and sending it directly to the manager node for execution. The response from 
+    the manager node is returned to the client.
+
+    Returns:
+    str: The response from executing the SQL query on the manager node.
+    """
     query_params = request.args.get('query')
     manager_ip = to_string_ip(get_manager_ips())
     print(f"Proxy direct-hit \n Sending request to : {manager_ip} with query : {query_params}")
@@ -149,6 +262,16 @@ def direct_hit():
 # Random-hit proxy is randomly choosing a worker node and sending the request to that node.
 @app.route('/random-hit')
 def random_hit():
+    """
+    Handle the 'random-hit' proxy method.
+
+    This route processes a random-hit request by taking an SQL query parameter,
+    randomly selecting a worker node, and sending the query to this node. The 
+    response from the worker node is returned to the client.
+
+    Returns:
+    str: The response from executing the SQL query on the randomly selected worker node.
+    """
     query_params = request.args.get('query')
     manager_ip = to_string_ip(get_manager_ips())
     worker_ip = get_random_worker(get_workers_ips())
@@ -159,6 +282,16 @@ def random_hit():
 # Customized-hit proxy is choosing the worker node with the lowest latency and sending the request to that worker node.
 @app.route('/custom-hit')
 def customized():
+    """
+    Handle the 'custom-hit' proxy method.
+
+    This route processes a custom-hit request by taking an SQL query parameter,
+    finding the worker node with the lowest latency, and sending the query to 
+    this node. The response from the fastest worker node is returned to the client.
+
+    Returns:
+    str: The response from executing the SQL query on the fastest worker node.
+    """
     query_params = request.args.get('query')
     manager_ip = to_string_ip(get_manager_ips())
     worker_ip_list = get_workers_ips()
