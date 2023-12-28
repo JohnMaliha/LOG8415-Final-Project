@@ -7,6 +7,8 @@ from credentials import *
 
 stop_requests = threading.Event() # global event to detect keyboard interrupt.
 
+# I abandonned completing the automatic requests because of my AWS account got cancelled.
+
 session = boto3.Session(
     aws_access_key_id = access_key,
     aws_secret_access_key = secret_key,
