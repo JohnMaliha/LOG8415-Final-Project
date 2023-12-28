@@ -44,3 +44,9 @@
 ## To see logs on the server (instances)
 - cat /var/log/cloud-init-output.log
 - tail -f logs.log
+
+## here are some examples of queries to run.
+- http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=SELECT%20COUNT(*)%20FROM%20film; --> shoud return 1000
+- http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=INSERT INTO sakila.actor (first_name, last_name) VALUES ('Homer', 'Flinstone'); --> returns nothing
+- http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=SELECT%20name%20FROM%20actor --> will return all the data in the table actor including homer Flinstone.
+
