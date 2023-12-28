@@ -48,5 +48,5 @@
 ## here are some examples of queries to run.
 - http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=SELECT%20COUNT(*)%20FROM%20film; --> shoud return 1000
 - http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=INSERT INTO sakila.actor (first_name, last_name) VALUES ('Homer', 'Flinstone'); --> returns nothing
-- http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=SELECT%20name%20FROM%20actor --> will return all the data in the table actor including homer Flinstone.
+- http://GATEKEEPER_PUBLIC_IP/gatekeeper?proxy_type=custom-hit&query=SELECT first_name,last_name FROM actor --> will return all the data in the table actor including homer Flinstone.
 
