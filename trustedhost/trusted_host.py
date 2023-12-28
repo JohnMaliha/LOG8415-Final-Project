@@ -29,7 +29,7 @@ def get_proxy_address_to_dns():
     proxy_ips = ec2_resource.instances.filter(
         Filters=[
             {'Name': 'tag:Name', 'Values': ['t2_proxy']},
-            {'Name': 'instance-state-name', 'Values': ['running']}
+            {'Name': 'instance-state-name', 'Values': ['running']} # the running instances are the ones that interest us.
         ])
     for proxy in proxy_ips:
         proxy_list.append(proxy.public_ip_address)
@@ -46,7 +46,7 @@ def ssh_handler(proxy_dns, proxy_type, sql_query):
         ssh_pkey='final_assignment.pem',
         remote_bind_address=(proxy_dns, 5050)
     ) as tunnel:
-        # Its recommanded to use the dns and not the ip address. Both ways work, i decided to opt out for the dns way.
+        # Its recommended to use the dns and not the ip address. Both ways work, i decided to opt out for the dns way.
         # https://stackoverflow.com/questions/57579359/use-python-sshtunnel-for-port-forwarding-rest-request
         try:
             dns = f'http://{proxy_dns}/{proxy_type}?query={sql_query}'
@@ -60,10 +60,12 @@ def ssh_handler(proxy_dns, proxy_type, sql_query):
             print("Connection to proxy : Tunnel closed")
     return response
 
+# default route for the proxy. To see it it works.
 @app.route("/")
 def default():
     return get_proxy_address_to_dns()
 
+# The route that will be used to send requests.
 @app.route('/trusted_host', methods=['GET'])
 def sending_to_proxy():
     proxy_type = request.args.get('proxy_type')

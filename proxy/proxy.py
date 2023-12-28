@@ -72,7 +72,9 @@ def ssh_connection_handler(manager_ip,worker_ip,sql_query):
             print(f"Connection to data-master nodes : Tunnel established to manager node {manager_ip} and data node : {worker_ip} Local port: {3306}. The query is {sql_query}")
             cursor.execute(sql_query)
             response = cursor.fetchall()
-            for row in response: # look into response.json() and json.dumps()
+            # response.json()  
+            # json.dumps()
+            for row in response: 
                 resp = resp + str(row)
                 print(resp)
     except Exception as e:
@@ -136,7 +138,7 @@ def worker():
 # For all the proxy patterns implementations here is an example of the url : 
 # http://ADDRESS:PORT/PROXY_METHOD?query=YOURSQLQUERY;
 
-# Direct-hit proxy : imedietly send the request to the master(manager) node. 
+# Direct-hit proxy : immediately send the request to the master(manager) node. 
 @app.route('/direct-hit')
 def direct_hit():
     query_params = request.args.get('query')

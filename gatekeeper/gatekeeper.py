@@ -34,6 +34,7 @@ def get_trusted_host_address_to_dns():
         trusted_host_list.append(trusted_host.public_ip_address)
     return modify_ip_to_dns(trusted_host_list[0])
 
+# This function allows to establish a ssh tunnel and send a request to the proxy.
 def ssh_handler(trusted_host_dns, proxy_type, sql_query):
     response = "Response from trusted host: \n"
 
