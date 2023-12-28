@@ -14,7 +14,7 @@ app.debug =False # for debugging
 session = boto3.Session(
     aws_access_key_id = access_key,
     aws_secret_access_key = secret_key,
-    aws_session_token = token,
+    # aws_session_token = token,
     region_name= "us-east-1"
 )
 ec2_resource = session.resource('ec2')

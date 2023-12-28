@@ -13,7 +13,7 @@ app.debug =False # for debugging
 session = boto3.Session(
     aws_access_key_id = access_key,
     aws_secret_access_key = secret_key,
-    aws_session_token = token,
+    # aws_session_token = token,
     region_name= "us-east-1"
 )
 ec2_resource = session.resource('ec2')
@@ -35,6 +35,8 @@ def get_proxy_address_to_dns():
         proxy_list.append(proxy.public_ip_address)
     return modify_ip_to_dns(proxy_list[0])
 
+
+# Function that handles the creation of the tunnel and sending the requests to the proxy.
 def ssh_handler(proxy_dns, proxy_type, sql_query):
     response = "Response from proxy: \n"
 
@@ -44,6 +46,8 @@ def ssh_handler(proxy_dns, proxy_type, sql_query):
         ssh_pkey='final_assignment.pem',
         remote_bind_address=(proxy_dns, 5050)
     ) as tunnel:
+        # Its recommanded to use the dns and not the ip address. Both ways work, i decided to opt out for the dns way.
+        # https://stackoverflow.com/questions/57579359/use-python-sshtunnel-for-port-forwarding-rest-request
         try:
             dns = f'http://{proxy_dns}/{proxy_type}?query={sql_query}'
             res = requests.get(dns)
